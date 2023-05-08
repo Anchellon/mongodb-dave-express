@@ -19,8 +19,8 @@ const sessionStore = new MongoDBStore({
   collection: "sessions",
 });
 
-let indexRouter = require("./routes/index");
-let usersRouter = require("./routes/users");
+let indexRouter = require("./src/routes/index");
+let usersRouter = require("./src/routes/users");
 
 let app: Application = express();
 
