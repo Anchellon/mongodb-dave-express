@@ -13,7 +13,14 @@ let router = Router();
 
 /* GET home page. */
 router.get("/", function (req: Request, res: Response, next: NextFunction) {
-  res.render("index", { title: "Express" });
+  if (req.session.viewCount) {
+    req.session.viewCount = req.session.viewCount + 1;
+  } else {
+    req.session.viewCount = 1;
+  }
+  res.send(
+    `<h1>This is the number of times you have viewd the page ${req.session.viewCount}</h1>`
+  );
 });
 
 module.exports = router;
