@@ -1,19 +1,19 @@
 import createError from "http-errors";
 import express, { Application, Request, Response, NextFunction } from "express";
 import * as path from "path";
-import cookieParser from "cookie-parser";
 import logger from "morgan";
 import mongoose from "mongoose";
 // Import session library from express-sessions
 import session from "express-session";
 //Import mongodb store libraries that connect to session
 import { default as connectMongoDBSession } from "connect-mongodb-session";
-let GoogleStrategy = require("passport-google-oauth20").Strategy;
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+
 // Creating passport connection
 
 import passport from "passport";
 import dotenv from "dotenv";
-import Strategy from "passport-oauth2";
+import User from "./src/models/User";
 
 dotenv.config();
 const dbString: any = process.env.DB_STRING;
@@ -28,13 +28,18 @@ const sessionStore = new MongoDBStore({
   databaseName: "cloudcamp",
   collection: "sessions",
 });
+
+main().catch((err) => console.log(err));
+async function main() {
+  await mongoose.connect(dbString);
+}
 sessionStore.on("error", function (error) {
   // Also get an error here
   console.log(error);
 });
 
-let indexRouter = require("./src/routes/index");
-let usersRouter = require("./src/routes/users");
+// let indexRouter = require("./src/routes/index");
+// let usersRouter = require("./src/routes/users");
 
 let app: Application = express();
 
@@ -56,11 +61,16 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 // add strategy below session
-passport.serializeUser((user, done) => {
-  return done(null, user);
+passport.serializeUser((user: any, done: any) => {
+  console.log(user._id);
+  done(null, user._id);
 });
-passport.deserializeUser((user: any, done) => {
-  return done(null, user);
+passport.deserializeUser((id: any, done) => {
+  console.log(id);
+  console.log("throw up");
+  User.findById(id).then((user) => {
+    done(null, user);
+  });
 });
 
 passport.use(
@@ -68,28 +78,65 @@ passport.use(
     {
       clientID: googleCientID,
       clientSecret: googleCientSecret,
-      callbackURL: "http://localhost:3000/auth/google/callback",
+      callbackURL: "http://localhost:3000/users/auth/google/callback",
     },
-    function (accessToken: any, refreshToken: any, profile: any, cb: any) {
-      console.log(profile);
-      cb(null, profile);
+    // Save the user here
+    function (accessToken: any, refreshToken: any, profile: any, done: any) {
+      User.findOne({ id: profile.id, provider: "google" }).then((currUser) => {
+        if (currUser) {
+          console.log("current user ", currUser);
+          done(null, currUser);
+        } else {
+          new User({
+            username: "",
+            hash: "",
+            salt: "",
+            firstName: profile.name.givenName,
+            lastName: profile.name.familyName,
+            profilePic: profile.photos[0].value,
+            id: profile.id,
+            provider: "google",
+            isAdmin: false,
+            role: "user",
+          })
+            .save()
+            .then((newUser) => {
+              console.log("New user created" + newUser);
+              done(null, newUser);
+            });
+        }
+      });
     }
   )
 );
 
 app.get(
-  "/auth/google",
+  "/users/auth/google",
   passport.authenticate("google", { scope: ["profile"] })
 );
 app.get(
-  "/auth/google/callback",
+  "/users/auth/google/callback",
   passport.authenticate("google"),
   function (req, res) {
     // Successful authentication, redirect home.
-    console.log("Im here");
+    console.log(req.user);
     res.redirect("http://localhost:5173");
   }
 );
+
+app.get("/logout", function (req, res, next) {
+  console.log(req.user);
+  if (req.user) {
+    req.logout(function (err) {
+      if (err) {
+        return next(err);
+      }
+      res.send("success");
+    });
+  } else {
+    res.send("Already logged out");
+  }
+});
 
 //  Next strategy
 // passport.use(
@@ -118,7 +165,7 @@ app.get(
 // app.use(logger("dev"));
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
+
 // app.use(express.static(path.join(__dirname, "public")));
 
 // catch 404 and forward to error handler
