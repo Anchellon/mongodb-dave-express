@@ -4,22 +4,20 @@ import dotenv = require("dotenv");
 
 import User from "../models/User";
 import { Request, Response, NextFunction, Router } from "express";
-import OAuth2Strategy = require("passport-oauth2");
+const GitHubStrategy = require("passport-github2");
 
 let router = Router();
 
 dotenv.config();
-const googleCientID: any = process.env.GOOGLE_CLIENTID;
-const googleCientSecret: any = process.env.GOOGLE_SECRET;
-const ghCientID: any = process.env.GH_CLIENTID;
-const ghCientSecret: any = process.env.GH_SECRET;
+const googleCientID: string | undefined = process.env.GOOGLE_CLIENTID;
+const googleCientSecret: string | undefined = process.env.GOOGLE_SECRET;
+const ghCientID: string | undefined = process.env.GH_CLIENTID;
+const ghCientSecret: string | undefined = process.env.GH_SECRET;
 passport.serializeUser((user: any, done: any) => {
   console.log(user._id);
   done(null, user._id);
 });
 passport.deserializeUser((id: any, done) => {
-  console.log(id);
-  console.log("throw up");
   User.findById(id).then((user) => {
     done(null, user);
   });
@@ -63,26 +61,45 @@ passport.use(
 );
 
 passport.use(
-  "github-strat",
-  new OAuth2Strategy(
+  new GitHubStrategy(
     {
-      authorizationURL: "https://github.com/login/oauth/authorize",
-      tokenURL: "https://github.com/login/oauth/access_token",
       clientID: ghCientID,
       clientSecret: ghCientSecret,
-      callbackURL: "http://localhost:3000/auth/github/callback",
+      callbackURL: "http://localhost:3000/users/auth/github/callback",
     },
     // Called on successful login , use logic here like insert into db
-    function (accessToken: any, refreshToken: any, profile: any, cb: any) {
+    function (
+      accessToken: string,
+      refreshToken: string,
+      profile: any,
+      done: any
+    ) {
       console.log(profile);
-      cb(null, profile);
+      User.findOne({ id: profile.id, provider: "github" }).then((currUser) => {
+        if (currUser) {
+          console.log("current user ", currUser);
+          done(null, currUser);
+        } else {
+          new User({
+            username: profile.username,
+            hash: "",
+            salt: "",
+            firstName: "",
+            lastName: "",
+            profilePic: profile.photos[0].value,
+            id: profile.id,
+            provider: "github",
+            isAdmin: false,
+            role: "user",
+          })
+            .save()
+            .then((newUser) => {
+              console.log("New user created" + newUser);
+              done(null, newUser);
+            });
+        }
+      });
     }
-    // default example call back
-    // function (accessToken: , refreshToken, profile, cb) {
-    //   User.findOrCreate({ exampleId: profile.id }, function (err, user) {
-    //     return cb(err, user);
-    //   });
-    // }
   )
 );
 
@@ -103,14 +120,15 @@ router.get(
 
 router.get(
   "/auth/github",
-  passport.authenticate("ouath2", { scope: ["profile"] })
+  passport.authenticate("github", { scope: ["user"] })
 );
 
 router.get(
   "/auth/github/callback",
-  passport.authenticate("github-strat ", { failureRedirect: "/login" }),
+  passport.authenticate("github"),
   function (req, res) {
     // Successful authentication, redirect home.
+    console.log(req.user);
     res.redirect("http://localhost:5173");
   }
 );

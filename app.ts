@@ -1,6 +1,5 @@
 import createError from "http-errors";
 import express, { Application, Request, Response, NextFunction } from "express";
-import * as path from "path";
 import logger from "morgan";
 import mongoose from "mongoose";
 // Import session library from express-sessions
@@ -69,8 +68,6 @@ app.get("/logout", function (req, res, next) {
     res.send("Already logged out");
   }
 });
-
-// app.use(express.static(path.join(__dirname, "public")));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
