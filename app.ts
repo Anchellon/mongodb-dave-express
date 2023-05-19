@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import session from "express-session";
 //Import mongodb store libraries that connect to session
 import { default as connectMongoDBSession } from "connect-mongodb-session";
-
+import cors from "cors";
 // Creating passport connection
 
 import passport from "passport";
@@ -33,6 +33,7 @@ sessionStore.on("error", function (error) {
 
 // let indexRouter = require("./src/routes/index");
 let usersRouter = require("./src/routes/users");
+let toolDataRouter = require("./src/routes/toolInfo");
 
 let app: Application = express();
 app.use(
@@ -46,6 +47,7 @@ app.use(
     },
   })
 );
+app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -54,6 +56,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/users", usersRouter);
+app.use("/toolInfo", toolDataRouter);
 
 app.get("/logout", function (req, res, next) {
   console.log(req.user);
