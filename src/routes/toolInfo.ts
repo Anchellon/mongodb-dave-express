@@ -3,10 +3,9 @@ import isAuth from "../middlewares/authMiddleware";
 import passport from "passport";
 
 let router = Router();
+const tool_controller = require("../controllers/toolController");
+router.post("/", isAuth, tool_controller.tool_createTool);
 
-router.post("/", (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body);
-  res.status(200).send();
-});
+router.get("/", tool_controller.getTools);
 
 module.exports = router;

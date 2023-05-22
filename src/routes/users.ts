@@ -14,7 +14,7 @@ const googleCientSecret: string | undefined = process.env.GOOGLE_SECRET;
 const ghCientID: string | undefined = process.env.GH_CLIENTID;
 const ghCientSecret: string | undefined = process.env.GH_SECRET;
 passport.serializeUser((user: any, done: any) => {
-  console.log(user._id);
+  // console.log(user._id);
   done(null, user._id);
 });
 passport.deserializeUser((id: any, done) => {
@@ -34,7 +34,7 @@ passport.use(
     function (accessToken: any, refreshToken: any, profile: any, done: any) {
       User.findOne({ id: profile.id, provider: "google" }).then((currUser) => {
         if (currUser) {
-          console.log("current user ", currUser);
+          // console.log("current user ", currUser);
           done(null, currUser);
         } else {
           new User({
@@ -106,14 +106,17 @@ passport.use(
 /* GET users listing. */
 router.get(
   "/auth/google",
-  passport.authenticate("google", { scope: ["profile"] })
+  passport.authenticate("google", {
+    scope: ["profile"],
+    prompt: "select_account",
+  })
 );
 router.get(
   "/auth/google/callback",
   passport.authenticate("google"),
   function (req, res) {
     // Successful authentication, redirect home.
-    console.log(req.user);
+    // console.log(req.user);
     res.redirect("http://localhost:5173");
   }
 );
@@ -128,8 +131,14 @@ router.get(
   passport.authenticate("github"),
   function (req, res) {
     // Successful authentication, redirect home.
-    console.log(req.user);
+    // console.log(req.user);
     res.redirect("http://localhost:5173");
   }
 );
+router.get("/getInfo", (req: Request, res: Response, next: NextFunction) => {
+  // res.json(req.user);
+  console.log(req.user);
+  res.status(200).json(req.user);
+});
+
 module.exports = router;

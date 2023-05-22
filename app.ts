@@ -36,6 +36,13 @@ let usersRouter = require("./src/routes/users");
 let toolDataRouter = require("./src/routes/toolInfo");
 
 let app: Application = express();
+// Order matters keep cors before session middleware
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:5173",
+  })
+);
 app.use(
   session({
     secret: "some secret",
@@ -47,16 +54,15 @@ app.use(
     },
   })
 );
-app.use(cors());
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(passport.initialize());
-app.use(passport.session());
-
 app.use("/users", usersRouter);
-app.use("/toolInfo", toolDataRouter);
+app.use("/tools", toolDataRouter);
 
 app.get("/logout", function (req, res, next) {
   console.log(req.user);
@@ -65,28 +71,36 @@ app.get("/logout", function (req, res, next) {
       if (err) {
         return next(err);
       }
-      res.send("success");
+      res.send({ msg: "loggedOut" });
     });
   } else {
-    res.send("Already logged out");
+    res.redirect("http://localhost:5173");
   }
 });
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
+// app.use(function (req, res, next) {
+//   next(createError(404));
+// });
+
+app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
+  if (err) {
+    console.log("Error", err);
+  } else {
+    console.log("404");
+  }
 });
 
 // error handler
-app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-  let errorStatus = 0;
-  // render the error page
-  res.status(errorStatus || 500).send();
-  // res.render("error");
-});
+// app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
+//   // set locals, only providing error in development
+//   res.locals.message = err.message;
+//   res.locals.error = req.app.get("env") === "development" ? err : {};
+//   let errorStatus = 0;
+//   // render the error page
+//   res.status(errorStatus || 500).send();
+//   // res.render("error");
+// });
 
 app.listen(3000, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${3000}`);
