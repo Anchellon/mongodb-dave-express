@@ -34,7 +34,7 @@ sessionStore.on("error", function (error) {
 // let indexRouter = require("./src/routes/index");
 let usersRouter = require("./src/routes/users");
 let toolDataRouter = require("./src/routes/toolInfo");
-
+console.log(process.env.ALLOWED_ORIGIN);
 let app: Application = express();
 // Order matters keep cors before session middleware
 app.use(
