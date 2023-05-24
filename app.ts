@@ -40,7 +40,7 @@ let app: Application = express();
 app.use(
   cors({
     credentials: true,
-    origin: process.env.ALLOWED_ORIGIN,
+    origin: "*",
   })
 );
 app.use(
