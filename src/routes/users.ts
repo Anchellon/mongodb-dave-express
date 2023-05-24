@@ -28,7 +28,7 @@ passport.use(
     {
       clientID: googleCientID,
       clientSecret: googleCientSecret,
-      callbackURL: "http://localhost:3000/users/auth/google/callback",
+      callbackURL: process.env.CURRENT_MACHINE + "/users/auth/google/callback",
     },
     // Save the user here
     function (accessToken: any, refreshToken: any, profile: any, done: any) {
@@ -65,7 +65,7 @@ passport.use(
     {
       clientID: ghCientID,
       clientSecret: ghCientSecret,
-      callbackURL: "http://localhost:3000/users/auth/github/callback",
+      callbackURL: process.env.CURRENT_MACHINE + "/users/auth/github/callback",
     },
     // Called on successful login , use logic here like insert into db
     function (
@@ -117,7 +117,8 @@ router.get(
   function (req, res) {
     // Successful authentication, redirect home.
     // console.log(req.user);
-    res.redirect("http://localhost:5173");
+    let allowedOrigin: any = process.env.ALLOWED_ORIGIN;
+    res.redirect(allowedOrigin);
   }
 );
 
@@ -132,7 +133,8 @@ router.get(
   function (req, res) {
     // Successful authentication, redirect home.
     // console.log(req.user);
-    res.redirect("http://localhost:5173");
+    let allowedOrigin: any = process.env.ALLOWED_ORIGIN;
+    res.redirect(allowedOrigin);
   }
 );
 router.get("/getInfo", (req: Request, res: Response, next: NextFunction) => {

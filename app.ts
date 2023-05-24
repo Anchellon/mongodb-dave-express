@@ -104,7 +104,8 @@ app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
 // });
 
 app.listen(3000, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${3000}`);
+  let currMachine: any = process.env.CURRENT_MACHINE;
+  console.log("⚡️[server]: Server is running at " + currMachine);
 });
 
 module.exports = app;
