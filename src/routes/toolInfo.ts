@@ -4,7 +4,7 @@ import passport from "passport";
 
 let router = Router();
 const tool_controller = require("../controllers/toolController");
-router.post("/", isAuth, tool_controller.tool_createTool);
+router.post("/", tool_controller.tool_createTool);
 
 router.get("/", tool_controller.getTools);
 
