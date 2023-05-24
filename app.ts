@@ -40,7 +40,7 @@ let app: Application = express();
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:5173",
+    origin: process.env.ALLOWED_ORIGIN,
   })
 );
 app.use(
@@ -74,7 +74,8 @@ app.get("/logout", function (req, res, next) {
       res.send({ msg: "loggedOut" });
     });
   } else {
-    res.redirect("http://localhost:5173");
+    let redirect: any = process.env.ALLOWED_ORIGIN;
+    res.redirect(redirect);
   }
 });
 
