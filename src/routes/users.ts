@@ -28,7 +28,8 @@ passport.use(
     {
       clientID: googleCientID,
       clientSecret: googleCientSecret,
-      callbackURL: "/users/auth/google/callback",
+      callbackURL:
+        (process.env.CURRENT_MACHINE as string) + "/users/auth/google/callback",
     },
     // Save the user here
     function (accessToken: any, refreshToken: any, profile: any, done: any) {
