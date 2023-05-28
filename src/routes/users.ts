@@ -28,7 +28,7 @@ passport.use(
     {
       clientID: googleCientID,
       clientSecret: googleCientSecret,
-      callbackURL: process.env.CURRENT_MACHINE + "/users/auth/google/callback",
+      callbackURL: "/users/auth/google/callback",
     },
     // Save the user here
     function (accessToken: any, refreshToken: any, profile: any, done: any) {
@@ -65,7 +65,8 @@ passport.use(
     {
       clientID: ghCientID,
       clientSecret: ghCientSecret,
-      callbackURL: process.env.CURRENT_MACHINE + "/users/auth/github/callback",
+      callbackURL:
+        (process.env.CURRENT_MACHINE as string) + "/users/auth/github/callback",
     },
     // Called on successful login , use logic here like insert into db
     function (
@@ -118,7 +119,7 @@ router.get(
     // Successful authentication, redirect home.
     // console.log(req.user);
     let allowedOrigin: any = process.env.ALLOWED_ORIGIN;
-    res.redirect(allowedOrigin);
+    res.redirect(allowedOrigin as string);
   }
 );
 
@@ -134,7 +135,7 @@ router.get(
     // Successful authentication, redirect home.
     // console.log(req.user);
     let allowedOrigin: any = process.env.ALLOWED_ORIGIN;
-    res.redirect(allowedOrigin);
+    res.redirect(allowedOrigin as string);
   }
 );
 router.get("/getInfo", (req: Request, res: Response, next: NextFunction) => {

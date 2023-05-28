@@ -17,7 +17,7 @@ const MongoDBStore = connectMongoDBSession(session);
 dotenv.config();
 const dbString: any = process.env.DB_STRING;
 const sessionStore = new MongoDBStore({
-  uri: dbString,
+  uri: dbString as string,
   databaseName: "cloudcamp",
   collection: "sessions",
 });
@@ -34,13 +34,13 @@ sessionStore.on("error", function (error) {
 // let indexRouter = require("./src/routes/index");
 let usersRouter = require("./src/routes/users");
 let toolDataRouter = require("./src/routes/toolInfo");
-console.log(process.env.ALLOWED_ORIGIN);
+console.log(process.env.ALLOWED_ORIGIN as string);
 let app: Application = express();
 // Order matters keep cors before session middleware
 app.use(
   cors({
     credentials: true,
-    origin: process.env.ALLOWED_ORIGIN,
+    origin: process.env.ALLOWED_ORIGIN as string,
   })
 );
 app.use(
@@ -75,7 +75,7 @@ app.get("/logout", function (req, res, next) {
     });
   } else {
     let redirect: any = process.env.ALLOWED_ORIGIN;
-    res.redirect(redirect);
+    res.redirect(redirect as string);
   }
 });
 
@@ -105,7 +105,7 @@ app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
 
 app.listen(3000, () => {
   let currMachine: any = process.env.CURRENT_MACHINE;
-  console.log("⚡️[server]: Server is running at " + currMachine);
+  console.log("⚡️[server]: Server is running at " + (currMachine as string));
 });
 
 module.exports = app;
