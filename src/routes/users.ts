@@ -140,7 +140,7 @@ router.get(
   }
 );
 router.get("/getInfo", (req: Request, res: Response, next: NextFunction) => {
-  // res.json(req.user);
+  console.log("This is user");
   console.log(req.user);
   if (req.user) {
     res.status(200).json(req.user);
