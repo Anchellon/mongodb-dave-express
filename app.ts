@@ -47,7 +47,7 @@ app.use(
 app.use(
   session({
     secret: "some secret",
-    resave: false,
+    resave: true,
     saveUninitialized: false,
     store: sessionStore,
     cookie: {
