@@ -119,7 +119,7 @@ router.get(
   function (req, res) {
     // Successful authentication, redirect home.
     // console.log(req.user);
-    console.log(req.session.cookie);
+    console.log(res.cookie);
     let allowedOrigin: any = process.env.ALLOWED_ORIGIN;
     res.redirect(allowedOrigin as string);
   }
