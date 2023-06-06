@@ -18,7 +18,7 @@ exports.tool_createTool = (req: Request<ITool>, res: Response) => {
 
 exports.getTools = (req: Request, res: Response) => {
   let resObj: any = {};
-
+  console.log(req.session.cookie);
   Tool.find({ active: true }).then((toolArray) => {
     resObj.tools = toolArray;
     resObj.message = "Tool List for the user";
