@@ -35,7 +35,7 @@ passport.use(
     function (accessToken: any, refreshToken: any, profile: any, done: any) {
       User.findOne({ id: profile.id, provider: "google" }).then((currUser) => {
         if (currUser) {
-          // console.log("current user ", currUser);
+          console.log("current user Found", currUser);
           done(null, currUser);
         } else {
           new User({
