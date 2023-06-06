@@ -35,6 +35,7 @@ sessionStore.on("error", function (error) {
 let usersRouter = require("./src/routes/users");
 let toolDataRouter = require("./src/routes/toolInfo");
 console.log(process.env.ALLOWED_ORIGIN as string);
+console.log("hi");
 let app: Application = express();
 // Order matters keep cors before session middleware
 app.use(
@@ -49,7 +50,10 @@ app.use(
     resave: true,
     saveUninitialized: true,
     store: sessionStore,
+    rolling: true,
     cookie: {
+      sameSite: "none",
+      secure: true,
       maxAge: 1000 * 60 * 60 * 24, // Equals 1 day (1 day * 24 hr/1 day * 60 min/1 hr * 60 sec/1 min * 1000 ms / 1 sec)
     },
   })
